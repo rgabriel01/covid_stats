@@ -17,4 +17,17 @@ class CovidObservationsController < ApplicationController
 
     render :index
   end
+
+  def top
+    observation_date = params["observation_date"]
+    statistic = params["statistic"] || 'confirmed'
+    max_results = params["max_results"] || 10
+
+    results = CovidObservation
+      .where(observation_date: observation_date)
+      .order("#{CovidObservation::STATISTICS[statistic.to_sym]} desc")
+      .limit(max_results.to_i)
+
+    render json: TopStatisticsPresenter.call(results, observation_date)
+  end
 end
